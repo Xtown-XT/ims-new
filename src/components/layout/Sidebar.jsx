@@ -3,10 +3,12 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import logo from "../assets/Dark Logo.png";
-import { useTheme } from "../../context/ThemeContext";
-import { UpOutlined, DownOutlined } from "@ant-design/icons";
 import settings from "../assets/technology.png";
+import salesIcon from "../assets/sales.png";
+import { useTheme } from "../../context/ThemeContext";
+import { UpOutlined, DownOutlined, ShoppingOutlined } from "@ant-design/icons";
 
+// SubSidebar Component
 const SubSidebar = ({ parentItem, collapsed }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -82,7 +84,8 @@ const SubSidebar = ({ parentItem, collapsed }) => {
   const handleSubItemClick = (subItem) => {
     if (subItem.children && subItem.children.length > 0) {
       setOpenSubSubMenuKey(openSubSubMenuKey === subItem.key ? null : subItem.key);
-    } else {
+    } else if (subItem.key !== "sales") {
+      // Don't navigate for the sales menu item itself
       navigate(subItem.key);
     }
   };
@@ -150,7 +153,7 @@ const SubSidebar = ({ parentItem, collapsed }) => {
                 style={{
                   paddingTop: "0.25rem",
                   paddingBottom: "0.25rem",
-                  paddingLeft: collapsed ? "1rem" : "1.75rem",
+                  paddingLeft: collapsed ? "0.5rem" : "1rem",
                 }}
               >
                 {subItem.children.map((subSubItem) => (
@@ -161,6 +164,16 @@ const SubSidebar = ({ parentItem, collapsed }) => {
                     onMouseEnter={() => setHoveredKey(subSubItem.key)}
                     onMouseLeave={() => setHoveredKey(null)}
                   >
+                    {subSubItem.icon && (
+                      <span
+                        style={{
+                          marginRight: collapsed ? "0.25rem" : "0.5rem",
+                          color: pathname === subSubItem.key ? primaryColor : "inherit",
+                        }}
+                      >
+                        {subSubItem.icon}
+                      </span>
+                    )}
                     <span>{subSubItem.label}</span>
                   </div>
                 ))}
@@ -173,18 +186,12 @@ const SubSidebar = ({ parentItem, collapsed }) => {
   );
 };
 
-const Sidebar = ({ collapsed, menuItems, selectedParent, setSelectedParent }) => {
+// MAIN SIDEBAR
+const Sidebar = ({ collapsed, menuItems = [], selectedParent, setSelectedParent }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { theme, primaryColor, sidebarBgColor } = useTheme();
   const [hoveredKey, setHoveredKey] = useState(null);
-
-  const handleItemClick = (item) => {
-    if (!item.children) {
-      setSelectedParent(null);
-      navigate(item.key);
-    }
-  };
 
   const containerStyles = {
     height: "100%",
@@ -219,14 +226,194 @@ const Sidebar = ({ collapsed, menuItems, selectedParent, setSelectedParent }) =>
     return styles;
   };
 
-  return (
-    <div
-      style={{ position: "relative", height: "100%" }}
-    >
-      <div style={containerStyles}>
+  // Find POS, Sales, Invoice, Quotation, Online Order and POS Orders items from all levels
+  let posItem = null;
+  let salesItem = null;
+  let invoiceItem = null;
+  let quotationItem = null;
+  let onlineOrderItem = null;
+  let posOrdersItem = null;
+  let imsItem = null;
+  
+  menuItems.forEach((item) => {
+    // Check top level
+    const itemKey = item.key?.toLowerCase();
+    const itemLabel = item.label?.toLowerCase();
+    
+    if (itemKey?.includes("sales") && !itemKey?.includes("pos")) salesItem = item;
+    if (itemKey?.includes("pos") && !itemKey?.includes("order")) posItem = item;
+    if (itemKey?.includes("invoice")) invoiceItem = item;
+    if (itemKey?.includes("quotation")) quotationItem = item;
+    if (itemKey?.includes("online") && itemKey?.includes("order")) onlineOrderItem = item;
+    if (itemKey?.includes("pos") && itemKey?.includes("order")) posOrdersItem = item;
+    if (itemLabel?.includes("online") && itemLabel?.includes("order")) onlineOrderItem = item;
+    if (itemLabel?.includes("pos") && itemLabel?.includes("order")) posOrdersItem = item;
+    
+    // Identify IMS item (usually contains "inventory" or is the main parent)
+    if (itemKey?.includes("inventory") || itemKey?.includes("ims")) {
+      imsItem = item;
+    }
+    
+    // Check nested children
+    if (item.children) {
+      item.children.forEach((child) => {
+        const childKey = child.key?.toLowerCase();
+        const childLabel = child.label?.toLowerCase();
+        
+        if (childKey?.includes("sales") && !childKey?.includes("pos")) salesItem = child;
+        if (childKey?.includes("pos") && !childKey?.includes("order")) posItem = child;
+        if (childKey?.includes("invoice")) invoiceItem = child;
+        if (childKey?.includes("quotation")) quotationItem = child;
+        if (childKey?.includes("online") && childKey?.includes("order")) onlineOrderItem = child;
+        if (childKey?.includes("pos") && childKey?.includes("order")) posOrdersItem = child;
+        if (childLabel?.includes("online") && childLabel?.includes("order")) onlineOrderItem = child;
+        if (childLabel?.includes("pos") && childLabel?.includes("order")) posOrdersItem = child;
+      });
+    }
+  });
+
+  // First Sales item - with ALL sales-related items as dropdown
+  let firstSalesSubmenu = [];
+  
+  // Add original Sales children first
+  if (salesItem && salesItem.children) {
+    firstSalesSubmenu = [...salesItem.children];
+  }
+  
+  // Add all other sales-related items to the dropdown
+  const additionalItems = [
+    posItem && {
+      key: posItem.key,
+      label: posItem.label,
+      icon: posItem.icon,
+    },
+    invoiceItem && {
+      key: invoiceItem.key,
+      label: invoiceItem.label,
+      icon: invoiceItem.icon,
+    },
+    quotationItem && {
+      key: quotationItem.key,
+      label: quotationItem.label,
+      icon: quotationItem.icon,
+    },
+  ].filter(Boolean);
+  
+  firstSalesSubmenu = [...firstSalesSubmenu, ...additionalItems];
+
+  const firstSalesMenuItem = {
+    key: salesItem?.key || "sales-main",
+    label: salesItem?.label || "Sales",
+    icon: salesItem?.icon || (
+      <img
+        src={salesIcon}
+        alt="Sales"
+        style={{
+          width: "24px",
+          height: "24px",
+          objectFit: "contain",
+        }}
+      />
+    ),
+    children: firstSalesSubmenu.length > 0 ? firstSalesSubmenu : undefined,
+  };
+
+  // Second Sales item - with Online Order and POS Orders dropdown
+  const secondSalesSubmenu = [
+    onlineOrderItem && {
+      key: onlineOrderItem.key,
+      label: onlineOrderItem.label,
+      icon: onlineOrderItem.icon,
+    },
+    posOrdersItem && {
+      key: posOrdersItem.key,
+      label: posOrdersItem.label,
+      icon: posOrdersItem.icon,
+    },
+  ].filter(Boolean);
+
+  const secondSalesMenuItem = secondSalesSubmenu.length > 0 ? {
+    key: "sales-orders",
+    label: "Sales",
+    icon: (
+      <img
+        src={salesIcon}
+        alt="Sales"
+        style={{
+          width: "24px",
+          height: "24px",
+          objectFit: "contain",
+        }}
+      />
+    ),
+    children: secondSalesSubmenu,
+  } : null;
+
+  // Combine all items for IMS submenu
+  const imsSubmenuItems = [
+    firstSalesMenuItem,
+    secondSalesMenuItem,
+  ].filter(Boolean);
+
+  // Process menu items: exclude sales-related items and add Sales under IMS
+  const processedMenuItems = menuItems.map((item) => {
+    const itemKey = item.key?.toLowerCase();
+    const itemLabel = item.label?.toLowerCase();
+    
+    // If item itself is sales-related, exclude it
+    if (itemKey?.includes("sales") || itemKey?.includes("pos") || 
+        itemKey?.includes("invoice") || itemKey?.includes("quotation") ||
+        (itemKey?.includes("online") && itemKey?.includes("order")) ||
+        (itemLabel?.includes("online") && itemLabel?.includes("order")) ||
+        (itemLabel?.includes("pos") && itemLabel?.includes("order"))) {
+      return null;
+    }
+    
+    // If item has children, filter out sales-related items from children
+    let filteredChildren = [];
+    if (item.children) {
+      filteredChildren = item.children.filter((child) => {
+        const childKey = child.key?.toLowerCase();
+        const childLabel = child.label?.toLowerCase();
+        return !childKey?.includes("sales") && !childKey?.includes("pos") &&
+               !childKey?.includes("invoice") && !childKey?.includes("quotation") &&
+               !(childKey?.includes("online") && childKey?.includes("order")) &&
+               !(childLabel?.includes("online") && childLabel?.includes("order")) &&
+               !(childLabel?.includes("pos") && childLabel?.includes("order"));
+      });
+    }
+    
+    // If this is the IMS item, add Sales after Inventory
+    const isImsItem = itemKey?.includes("inventory") || itemKey?.includes("ims") || 
+                      item === imsItem;
+    
+    if (isImsItem) {
+      // Find the inventory child
+      const inventoryIndex = filteredChildren.findIndex(child => 
+        child.key?.toLowerCase().includes("inventory")
+      );
       
-        <div style={{ padding: "0.5m", height: "calc(100% - 100px)", fontWeight: "500", }}>
-          {menuItems.map((item) => (
+      // Insert all sales items right after Inventory
+      if (inventoryIndex !== -1) {
+        filteredChildren.splice(inventoryIndex + 1, 0, ...imsSubmenuItems);
+      } else {
+        // If no inventory found, add sales items at the beginning
+        filteredChildren.unshift(...imsSubmenuItems);
+      }
+    }
+    
+    return {
+      ...item,
+      children: filteredChildren.length > 0 ? filteredChildren : undefined,
+    };
+  }).filter(Boolean);
+
+  return (
+    <div style={{ position: "relative", height: "100%" }}>
+      <div style={containerStyles}>
+        <div style={{ padding: "0.5rem", height: "calc(100% - 100px)", fontWeight: "500" }}>
+          {/* IMS Items (with Sales inside IMS, below Inventory) */}
+          {processedMenuItems.map((item) => (
             <div
               key={item.key}
               style={getMenuItemStyles(item.key)}
@@ -236,7 +423,7 @@ const Sidebar = ({ collapsed, menuItems, selectedParent, setSelectedParent }) =>
                 if (item.children) {
                   setSelectedParent(selectedParent?.key === item.key ? null : item);
                 } else {
-                  handleItemClick(item);
+                  navigate(item.key);
                 }
               }}
             >
@@ -257,9 +444,9 @@ const Sidebar = ({ collapsed, menuItems, selectedParent, setSelectedParent }) =>
             </div>
           ))}
         </div>
-        
-        {/* Settings button fixed at bottom */}
-        <div 
+
+        {/* Settings */}
+        <div
           style={{
             position: "absolute",
             bottom: "20px",
@@ -270,6 +457,7 @@ const Sidebar = ({ collapsed, menuItems, selectedParent, setSelectedParent }) =>
             padding: "0.5rem",
           }}
         >
+         
           <div
             style={{
               ...getMenuItemStyles("settings"),
@@ -293,9 +481,9 @@ const Sidebar = ({ collapsed, menuItems, selectedParent, setSelectedParent }) =>
                 justifyContent: "center",
               }}
             >
-              <img 
-                src={settings} 
-                alt="Settings" 
+              <img
+                src={settings}
+                alt="Settings"
                 style={{
                   width: collapsed ? "24px" : "26px",
                   height: collapsed ? "24px" : "26px",
@@ -306,10 +494,11 @@ const Sidebar = ({ collapsed, menuItems, selectedParent, setSelectedParent }) =>
           </div>
         </div>
       </div>
+
+      {/* SubSidebar for items with children (including Sales under IMS) */}
       {selectedParent && selectedParent.children && (
         <SubSidebar
           parentItem={selectedParent}
-          onClose={() => setSelectedParent(null)}
           collapsed={collapsed}
         />
       )}

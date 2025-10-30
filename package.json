@@ -1,5 +1,5 @@
 {
-  "name": "ssms",
+  "name": "ims",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,15 +11,21 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons": "^6.1.0",
+    "@fortawesome/free-brands-svg-icons": "^7.1.0",
+    "@fortawesome/free-regular-svg-icons": "^7.1.0",
+    "@fortawesome/free-solid-svg-icons": "^7.1.0",
+    "@fortawesome/react-fontawesome": "^3.1.0",
     "@tailwindcss/vite": "^4.1.5",
-    "antd": "^5.24.9",
-    "axios": "^1.9.0",
+    "antd": "^5.27.6",
+    "axios": "^1.12.2",
     "idb": "^8.0.3",
     "jspdf": "^3.0.3",
+    "lucide-react": "^0.548.0",
     "moment": "^2.30.1",
-    "react": "^19.1.0",
+    "react": "^18.3.1",
     "react-color": "^2.19.3",
-    "react-dom": "^19.1.0",
+    "react-dom": "^18.3.1",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.5.3",
     "tailwindcss": "^4.1.5"
