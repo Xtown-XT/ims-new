@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import { FileDoneOutlined, AppstoreOutlined, SwapOutlined, SlidersOutlined } from "@ant-design/icons";
+import { FileDoneOutlined, AppstoreOutlined, SwapOutlined, SlidersOutlined,ShopOutlined,ShoppingCartOutlined,FileTextOutlined,FileOutlined,FormOutlined   } from "@ant-design/icons";
 
 // Inventory Pages
 import Products from "./pages/inventory/products";
@@ -19,6 +19,15 @@ import AccountStatement from "./pages/Finance&Accounts/AccountStatement";
 import ManageStock from "./pages/stock/ManageStock";
 import StockAdjustment from "./pages/stock/StockAdjustment";
 import StockTransfer from "./pages/stock/StockTransfer";
+
+
+import OnlineOrder from "./pages/Sales/sales/OnlineOrder";
+import POSOrders from "./pages/Sales/sales/POSOrders";
+import POS from "./pages/Sales/POS/POS";
+import Invoices from "./pages/Sales/invoices";
+import Quotation from "./pages/Sales/Quotation";
+import Dashboard from "./pages/Dashboard";
+
 
 export const imsMenuItems = [
   // Inventory
@@ -110,6 +119,43 @@ export const imsMenuItems = [
         label: "Account Statement",
         icon: <FileDoneOutlined />,
       },
+
+      // POS
+  {
+    icon: <ShopOutlined />,
+    key: "/ims/sales/pos",
+    label: "POS",
+  },
+  // Sales Orders
+  {
+    icon: <ShoppingCartOutlined />,
+    key: "/ims/sales",
+    label: "Sales",
+    children: [
+      { 
+        key: "/ims/sales/online-orders",
+        label: "Online Orders",
+        icon: <FileTextOutlined />,
+      },
+      { 
+        key: "/ims/sales/pos-orders",
+        label: "POS Orders",
+        icon: <FileTextOutlined />,
+      },
+    ]
+  },
+  // Invoice
+  {
+    icon: <FileOutlined />,
+    key: "/ims/invoice",
+    label: "Invoice",
+  },
+  // Quotation
+  {
+    icon: <FormOutlined />,
+    key: "/ims/quotation",
+    label: "Quotation",
+  },
     ],
   },
 ];
@@ -128,6 +174,22 @@ const IMSRoutes = () => {
       <Route path="stock/adjustment" element={<StockAdjustment />} />
       <Route path="stock/transfer" element={<StockTransfer />} />
 
+
+{/* Inventory Routes */}
+      <Route path="inventory/products" element={<Products />} />
+      
+      {/* POS Route */}
+      <Route path="sales/pos" element={<POS />} />
+      
+      {/* Sales Orders Routes */}
+      <Route path="sales/online-orders" element={<OnlineOrder />} />
+      <Route path="sales/pos-orders" element={<POSOrders />} />
+      
+      {/* Invoice Route */}
+      <Route path="invoice" element={<Invoices />} />
+      
+      {/* Quotation Route */}
+      <Route path="quotation" element={<Quotation />} />
       {/* Finance & Accounts */}
       <Route path="FinanceAccounts/Expenses" element={<Expenses />} />
       <Route

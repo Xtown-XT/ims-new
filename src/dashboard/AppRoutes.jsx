@@ -1,5 +1,5 @@
 
-import {AuditOutlined, DesktopOutlined , ClusterOutlined   } from "@ant-design/icons";
+import {AuditOutlined, DesktopOutlined , ClusterOutlined } from "@ant-design/icons";
 export const dashboardMenuItems = [
   {
     icon:<AuditOutlined />,

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import MainLayout from "./components/layout/MainLayout";
 import dashboard from "./components/assets/dashboard.png";
 
+
 import Login from "./login/Login";
 import Register from "./login/RegisterPage";
 import ProtectedRoute from "./context/ProtectedRoute";
@@ -10,7 +11,7 @@ import { AuthProvider } from "./context/AuthContext";
 import Loading from "./utils/Loading";
 import Settings from "./components/pages/Settings";
 import Pos from "./ims/pages/Sales/POS/POS"; // ✅ New POS Page Import
-
+import ims from "./components/assets/sewing-machine.png"
 const routeModules = import.meta.glob("./*/AppRoutes.jsx", { eager: true });
 
 // Example static import (you can extend this later)
