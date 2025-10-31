@@ -2,7 +2,6 @@ import { Suspense, useMemo } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import MainLayout from "./components/layout/MainLayout";
 import dashboard from "./components/assets/dashboard.png";
-import ims from "./components/assets/sewing-machine.png";
 
 import Login from "./login/Login";
 import Register from "./login/RegisterPage";
