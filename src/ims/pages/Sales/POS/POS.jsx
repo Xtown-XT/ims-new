@@ -17,17 +17,6 @@ import NikeJordan from "../../Sales/assets/NikeJordan.png";
 import AppleWatch from "../../Sales/assets/AppleWatch.png";
 import Iphone14Pro from "../../Sales/assets/Iphone14Pro.png";
 
-/**
- * DreamPOS-like POS layout (single-file)
- * - Left column: categories sidebar + search + product grid
- * - Right column: order list, payment summary
- * - Sticky footer with actions
- *
- * Notes:
- * - Tailwind CSS is used heavily; make sure it's configured in your project.
- * - You can replace sampleProducts with real API data.
- */
-
 const sampleProducts = [
   { id: 1, title: "IPhone 14 64GB", category: "Mobiles", price: 15800, img: Iphone14Pro },
   { id: 2, title: "MacBook Pro", category: "Laptops", price: 1000, img: LenovoIdeaPad3 },
@@ -60,14 +49,13 @@ export default function POS() {
     name: "Walk in Customer",
     phone: "",
     email: "",
-    bonus: 0,
-    loyalty: 0,
+    bonus: 148,
+    loyalty: 20,
     country: "",
     city: "",
     address: ""
   });
 
-  // ✅ Hide Ant Design sidebar and header dynamically when on POS page
   useEffect(() => {
     const layoutWrapper = document.querySelector(".ant-layout.ant-layout-has-sider");
 
@@ -93,8 +81,6 @@ export default function POS() {
       layoutWrapper.style.display = "block";
       layoutWrapper.style.width = "100%";
       layoutWrapper.style.flexDirection = "column";
-    } else {
-      console.warn("Ant Design layout not found!");
     }
 
     return () => {
@@ -155,22 +141,15 @@ export default function POS() {
   }
 
   const subtotal = orderItems.reduce((s, it) => s + it.price * it.qty, 0);
-  const scrollableHeight = "calc(100vh - 120px)";
 
   return (
     <div className="w-full h-screen overflow-hidden bg-gray-50 text-slate-800">
-
-      {/* Main two-column container */}
       <div className="flex w-full gap-4 px-6 pt-6 pb-24">
-        {/* Left section */}
         <div className="flex gap-6 flex-1">
-          {/* Sidebar categories (with subtle divider to product area) */}
           <div className="w-24 md:w-32 flex-shrink-0 border-r border-gray-200 pr-3">
             <div className="flex flex-col gap-3 sticky top-6" style={{ alignItems: "center" }}>
               {categories.map((c) => {
                 const active = selectedCategory === c;
-
-                // 🖼️ Match category to image
                 const categoryImages = {
                   All: Iphone14Pro,
                   Headset: Bold,
@@ -181,7 +160,6 @@ export default function POS() {
                   Appliance: Bold,
                   Computer: LenovoIdeaPad3,
                 };
-                // vertical card button
                 return (
                   <button
                     key={c}
@@ -190,8 +168,6 @@ export default function POS() {
                       }`}
                     title={c}
                   >
-
-                    {/* Category image */}
                     <div
                       className={`w-10 h-10 rounded-md flex items-center justify-center mb-2 overflow-hidden ${active ? "bg-orange-50" : "bg-gray-50"
                         }`}
@@ -202,8 +178,6 @@ export default function POS() {
                         className="object-contain w-8 h-8"
                       />
                     </div>
-
-                    {/* Category label */}
                     <span
                       className={`text-xs font-medium text-center ${active ? "text-orange-500" : "text-slate-600"
                         }`}
@@ -216,9 +190,7 @@ export default function POS() {
             </div>
           </div>
 
-          {/* Product content column */}
           <div className="flex-1 pl-4">
-            {/* Welcome + date */}
             <div className="mb-4">
               <h2 className="text-2xl font-semibold text-slate-800">
                 Welcome, Wesley Adrian
@@ -226,9 +198,7 @@ export default function POS() {
               <div className="text-sm text-slate-500 mt-1">December 24, 2024</div>
             </div>
 
-            {/* 🔍 Top product control bar (Search + View Brands + Featured) */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-              {/* Search Input */}
               <div className="relative w-full md:w-72">
                 <FiSearch className="absolute left-3 top-3 text-slate-400" />
                 <input
@@ -239,7 +209,6 @@ export default function POS() {
                 />
               </div>
 
-              {/* Buttons */}
               <div className="flex items-center gap-3">
                 <button className="px-5 py-2.5 rounded-lg text-white bg-slate-900 shadow-md text-sm font-medium hover:bg-slate-800 transition-all">
                   View All Brands
@@ -258,11 +227,10 @@ export default function POS() {
               </div>
             </div>
 
-            {/* 🧱 Product grid with scrollbar */}
             <div
               className="overflow-y-auto pr-2"
               style={{
-                height: "calc(100vh - 110px)", // fills up the whole viewport neatly
+                height: "calc(100vh - 110px)",
                 scrollbarWidth: "thin",
                 scrollbarColor: "#cbd5e1 #f1f5f9",
               }}
@@ -273,7 +241,6 @@ export default function POS() {
                     key={p.id}
                     className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm hover:shadow-md hover:border-green-400 transition-all duration-200 flex flex-col justify-between relative"
                   >
-                    {/* Green checkmark for featured items */}
                     <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white text-xs opacity-0">
                       ✓
                     </div>
@@ -319,12 +286,11 @@ export default function POS() {
           </div>
         </div>
 
-        {/* Right column: Order list and payment */}
         <div className="w-80 lg:w-96 flex-shrink-0">
           <div
             className="bg-white rounded-lg border shadow-sm p-4 overflow-y-auto"
             style={{
-              height: "calc(100vh - 110px)", // matches left side height
+              height: "calc(100vh - 110px)",
               position: "relative",
               scrollbarWidth: "thin",
               scrollbarColor: "#cbd5e1 #f1f5f9",
@@ -338,12 +304,11 @@ export default function POS() {
               </div>
             </div>
 
-            {/* Customer select */}
             <div className="mb-4">
-              <label className="block text-sm text-slate-600 mb-2">Customer Information</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Customer Information</label>
               <div className="flex gap-2">
                 <select
-                  className="flex-1 border rounded-lg px-3 py-2 bg-gray-50"
+                  className="flex-1 border rounded-lg px-3 py-2.5 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-400"
                   value={customerData.name}
                   onChange={(e) => setCustomerData({ ...customerData, name: e.target.value })}
                 >
@@ -352,37 +317,36 @@ export default function POS() {
                 </select>
                 <button
                   onClick={() => setShowCustomerModal(true)}
-                  className="px-3 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600"
+                  className="px-3 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors"
                 >
                   <FaUsers />
                 </button>
-                <button className="px-3 py-2 rounded-lg bg-sky-600 text-white hover:bg-sky-700">
+                <button className="px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">
                   <FiChevronDown />
                 </button>
               </div>
 
-              {/* Customer Info Display (like in reference) */}
               {customerData.name === "James Anderson" && (
-                <div className="mt-3 border border-orange-200 bg-orange-50 rounded-lg p-3">
-                  <div className="font-semibold text-slate-800">{customerData.name}</div>
-                  <div className="flex items-center gap-4 mt-2 text-sm">
+                <div className="mt-3 border-2 border-orange-300 bg-orange-50 rounded-xl p-4">
+                  <div className="font-bold text-lg text-slate-800 mb-3">{customerData.name}</div>
+                  <div className="flex items-center gap-3 text-sm mb-4">
                     <div className="flex items-center gap-2">
-                      <span className="text-slate-600">Bonus:</span>
-                      <span className="px-2 py-1 bg-cyan-500 text-white rounded font-semibold">
-                        {customerData.bonus}
+                      <span className="text-slate-600 font-medium">Bonus :</span>
+                      <span className="px-3 py-1.5 bg-cyan-500 text-white rounded-md font-bold text-base">
+                        148
                       </span>
                     </div>
-                    <div className="text-slate-400">|</div>
+                    <div className="text-slate-300 font-bold">|</div>
                     <div className="flex items-center gap-2">
-                      <span className="text-slate-600">Loyalty:</span>
-                      <span className="px-2 py-1 bg-emerald-500 text-white rounded font-semibold">
-                        ${customerData.loyalty}
+                      <span className="text-slate-600 font-medium">Loyalty :</span>
+                      <span className="px-3 py-1.5 bg-emerald-500 text-white rounded-md font-bold text-base">
+                        $20
                       </span>
                     </div>
                   </div>
                   <button
                     onClick={() => setShowCustomerModal(true)}
-                    className="mt-3 w-full py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-medium"
+                    className="w-full py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-semibold shadow-md transition-all"
                   >
                     Apply
                   </button>
@@ -390,55 +354,69 @@ export default function POS() {
               )}
             </div>
 
-            {/* Order items */}
             <div className="mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="text-md font-semibold">Order Details</h4>
-                <button onClick={clearOrder} className="text-sm text-rose-400">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-md font-semibold">
+                  Order Details <span className="text-slate-400 text-sm ml-2">Items : {orderItems.length}</span>
+                </h4>
+                <button onClick={clearOrder} className="text-sm text-rose-500 hover:text-rose-600 font-medium">
                   Clear all
                 </button>
               </div>
 
-              <div className="space-y-3">
-                {orderItems.length === 0 && (
-                  <div className="text-sm text-slate-500">
-                    No items in order. Click product to add.
+              {orderItems.length === 0 ? (
+                <div className="text-sm text-slate-500 text-center py-8">
+                  No items in order. Click product to add.
+                </div>
+              ) : (
+                <div className="border rounded-lg overflow-hidden">
+                  <div className="grid grid-cols-12 gap-2 bg-slate-50 px-3 py-2 border-b text-xs font-semibold text-slate-600">
+                    <div className="col-span-6">Item</div>
+                    <div className="col-span-3 text-center">QTY</div>
+                    <div className="col-span-3 text-right">Cost</div>
                   </div>
-                )}
 
-                {orderItems.map((it) => (
-                  <div key={it.id} className="flex items-center justify-between">
-                    <div className="flex items-start gap-3">
-                      <button
-                        onClick={() => changeQty(it.id, -1)}
-                        className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center"
-                      >
-                        <FiMinus />
-                      </button>
+                  <div className="divide-y">
+                    {orderItems.map((it) => (
+                      <div key={it.id} className="grid grid-cols-12 gap-2 px-3 py-3 items-center hover:bg-gray-50">
+                        <div className="col-span-6 flex items-center gap-2">
+                          <button
+                            onClick={() => changeQty(it.id, -it.qty)}
+                            className="text-slate-400 hover:text-red-500"
+                          >
+                            🗑️
+                          </button>
+                          <div className="min-w-0">
+                            <div className="text-sm font-medium text-slate-800 truncate">{it.title}</div>
+                          </div>
+                        </div>
 
-                      <div className="min-w-0">
-                        <div className="text-sm font-semibold">{it.title}</div>
-                        <div className="text-xs text-slate-400">${it.price}</div>
+                        <div className="col-span-3 flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => changeQty(it.id, -1)}
+                            className="w-6 h-6 rounded bg-slate-100 flex items-center justify-center hover:bg-slate-200 text-slate-600"
+                          >
+                            −
+                          </button>
+                          <span className="text-sm font-medium w-8 text-center">{it.qty}</span>
+                          <button
+                            onClick={() => changeQty(it.id, +1)}
+                            className="w-6 h-6 rounded bg-slate-100 flex items-center justify-center hover:bg-slate-200 text-slate-600"
+                          >
+                            +
+                          </button>
+                        </div>
+
+                        <div className="col-span-3 text-right">
+                          <div className="text-sm font-semibold text-slate-800">${(it.price * it.qty).toLocaleString()}</div>
+                        </div>
                       </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <div className="text-sm">{it.qty}</div>
-                      <button
-                        onClick={() => changeQty(it.id, +1)}
-                        className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center"
-                      >
-                        <FiPlus />
-                      </button>
-
-                      <div className="text-sm font-semibold">${it.price * it.qty}</div>
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
             </div>
 
-            {/* Discount mock */}
             <div className="mb-4">
               <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 text-sm flex items-center justify-between">
                 <div>
@@ -451,7 +429,6 @@ export default function POS() {
               </div>
             </div>
 
-            {/* Payment summary */}
             <div className="mb-4 border-t pt-4">
               <h4 className="text-md font-semibold mb-2">Payment Summary</h4>
               <div className="flex justify-between text-sm mb-1">
@@ -476,40 +453,55 @@ export default function POS() {
               </div>
             </div>
 
-            {/* Payment methods */}
             <div className="mb-4">
               <h4 className="text-md font-semibold mb-2">Select Payment</h4>
               <div className="grid grid-cols-3 gap-3">
-                <button className="col-span-1 flex items-center gap-2 justify-center py-3 rounded-lg border bg-amber-50">
-                  <FaMoneyBillAlt /> Cash
+                <button className="col-span-1 flex items-center gap-2 justify-center py-3 rounded-lg border bg-white hover:bg-gray-50">
+                  <span className="text-2xl">💵</span>
+                  <span>Cash</span>
                 </button>
-                <button className="col-span-1 flex items-center gap-2 justify-center py-3 rounded-lg border bg-white">
-                  <FaRegCreditCard /> Card
+                <button className="col-span-1 flex items-center gap-2 justify-center py-3 rounded-lg border bg-white hover:bg-gray-50">
+                  <span className="text-2xl">💳</span>
+                  <span>Card</span>
                 </button>
-                <button className="col-span-1 flex items-center gap-2 justify-center py-3 rounded-lg border bg-white">
-                  ⭐ Points
-                </button>
-
-                <button className="col-span-1 flex items-center gap-2 justify-center py-3 rounded-lg border bg-white">
-                  Deposit
-                </button>
-                <button className="col-span-1 flex items-center gap-2 justify-center py-3 rounded-lg border bg-white">
-                  Cheque
-                </button>
-                <button className="col-span-1 flex items-center gap-2 justify-center py-3 rounded-lg border bg-white">
-                  Gift Card
+                <button className="col-span-1 flex items-center gap-2 justify-center py-3 rounded-lg border bg-white hover:bg-gray-50">
+                  <span className="text-2xl">⭐</span>
+                  <span>Points</span>
                 </button>
 
-                <button className="col-span-2 py-3 rounded-lg border bg-white flex items-center gap-3 justify-center">
-                  Split Bill
+                <button className="col-span-1 flex items-center gap-2 justify-center py-3 rounded-lg border bg-white hover:bg-gray-50">
+                  <span className="text-2xl">👛</span>
+                  <span>Deposit</span>
                 </button>
-                <button className="col-span-1 py-3 rounded-lg border bg-white flex items-center gap-3 justify-center">
-                  External
+                <button className="col-span-1 flex items-center gap-2 justify-center py-3 rounded-lg border bg-white hover:bg-gray-50">
+                  <span className="text-2xl">📝</span>
+                  <span>Cheque</span>
+                </button>
+                <button className="col-span-1 flex items-center gap-2 justify-center py-3 rounded-lg border bg-white hover:bg-gray-50">
+                  <span className="text-2xl">🎁</span>
+                  <span>Gift Card</span>
+                </button>
+
+                <button className="col-span-1 flex items-center gap-2 justify-center py-3 rounded-lg border bg-white hover:bg-gray-50">
+                  <span className="text-2xl">📱</span>
+                  <span>Scan</span>
+                </button>
+                <button className="col-span-1 flex items-center gap-2 justify-center py-3 rounded-lg border bg-white hover:bg-gray-50">
+                  <span className="text-2xl">💰</span>
+                  <span>Pay Later</span>
+                </button>
+                <button className="col-span-1 flex items-center gap-2 justify-center py-3 rounded-lg border-2 border-orange-400 bg-white hover:bg-orange-50">
+                  <span className="text-2xl">🔌</span>
+                  <span className="text-orange-500 font-semibold">External</span>
+                </button>
+
+                <button className="col-span-3 py-3 rounded-lg border bg-white hover:bg-gray-50 flex items-center gap-2 justify-center">
+                  <span className="text-2xl">🤝</span>
+                  <span>Split Bill</span>
                 </button>
               </div>
             </div>
 
-            {/* print/place order */}
             <div className="flex items-center gap-3 mt-4">
               <button className="flex-1 py-3 rounded-lg border bg-white hover:bg-gray-100">
                 Print Order
@@ -519,7 +511,6 @@ export default function POS() {
               </button>
             </div>
 
-            {/* floating settings gear */}
             <button
               className="fixed right-8 bottom-40 w-12 h-12 rounded-full bg-orange-400 text-white shadow-lg flex items-center justify-center hover:bg-orange-500 transition-colors"
               title="Quick settings"
@@ -531,75 +522,68 @@ export default function POS() {
         </div>
       </div>
 
-      {/* Customer Modal */}
       {showCustomerModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
-            {/* Modal Header */}
-            <div className="sticky top-0 bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-4 flex items-center justify-between">
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-4 flex items-center justify-between">
               <h3 className="text-xl font-bold text-white">Add Customer</h3>
               <button
                 onClick={() => setShowCustomerModal(false)}
-                className="text-white hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition-colors"
+                className="text-white hover:bg-white/20 rounded-sm w-8 h-8 flex items-center justify-center transition-colors text-xl font-bold"
               >
                 ✕
               </button>
             </div>
 
-            {/* Modal Body */}
             <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Customer Name */}
+              <div className="grid grid-cols-3 gap-4 mb-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
                     Customer Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={customerData.name}
                     onChange={(e) => setCustomerData({ ...customerData, name: e.target.value })}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
-                    placeholder="Enter Customer Name"
+                    className="w-full border border-gray-300 rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                    placeholder="Walk in Customer"
                   />
                 </div>
-
-                {/* Email */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
                     Email <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="email"
                     value={customerData.email}
                     onChange={(e) => setCustomerData({ ...customerData, email: e.target.value })}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                    className="w-full border border-gray-300 rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
                     placeholder="Enter Email Address"
                   />
                 </div>
-
-                {/* Phone */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
                     Phone <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="tel"
                     value={customerData.phone}
                     onChange={(e) => setCustomerData({ ...customerData, phone: e.target.value })}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                    className="w-full border border-gray-300 rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
                     placeholder="Enter Phone Number"
                   />
                 </div>
+              </div>
 
-                {/* Country */}
+              <div className="grid grid-cols-3 gap-4 mb-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
                     Country
                   </label>
                   <select
                     value={customerData.country}
                     onChange={(e) => setCustomerData({ ...customerData, country: e.target.value })}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent bg-white"
+                    className="w-full border border-gray-300 rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent bg-white"
                   >
                     <option>Choose</option>
                     <option>United States</option>
@@ -609,96 +593,89 @@ export default function POS() {
                     <option>Australia</option>
                   </select>
                 </div>
-
-                {/* City */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
                     City
                   </label>
                   <input
                     type="text"
                     value={customerData.city}
                     onChange={(e) => setCustomerData({ ...customerData, city: e.target.value })}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                    className="w-full border border-gray-300 rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
                     placeholder="Enter City"
                   />
                 </div>
-
-                {/* Address */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
                     Address
                   </label>
                   <input
                     type="text"
                     value={customerData.address}
                     onChange={(e) => setCustomerData({ ...customerData, address: e.target.value })}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                    className="w-full border border-gray-300 rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
                     placeholder="Enter Address"
                   />
                 </div>
+              </div>
 
-                {/* Loyalty Points */}
+              <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
                     Loyalty Point
                   </label>
                   <input
                     type="number"
                     value={customerData.loyalty}
                     onChange={(e) => setCustomerData({ ...customerData, loyalty: e.target.value })}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
-                    placeholder="Enter Loyalty Points"
+                    className="w-full border border-gray-300 rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                    placeholder="0"
                   />
                 </div>
-
-                {/* Bonus Points */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
                     Bonus Point
                   </label>
                   <input
                     type="number"
                     value={customerData.bonus}
                     onChange={(e) => setCustomerData({ ...customerData, bonus: e.target.value })}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
-                    placeholder="Enter Bonus Points"
+                    className="w-full border border-gray-300 rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                    placeholder="0"
                   />
-                </div>
-
-                {/* Customer Image Upload - spans full width */}
-                <div className="md:col-span-3">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Customer Image
-                  </label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-orange-400 transition-colors cursor-pointer">
-                    <div className="flex flex-col items-center">
-                      <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mb-3">
-                        <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                        </svg>
-                      </div>
-                      <p className="text-sm text-slate-600 mb-1">
-                        <span className="text-orange-500 font-semibold">Click to upload</span> or drag and drop
-                      </p>
-                      <p className="text-xs text-slate-400">SVG, PNG, JPG or GIF (max. 800x400px)</p>
-                    </div>
-                    <input type="file" className="hidden" accept="image/*" />
-                  </div>
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-3 mt-6">
+              <div className="mb-6">
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Customer Image
+                </label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-orange-400 transition-colors cursor-pointer bg-white">
+                  <div className="flex flex-col items-center">
+                    <div className="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mb-3">
+                      <svg className="w-8 h-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                    </div>
+                    <p className="text-sm text-orange-500 font-semibold mb-1">
+                      Click to upload <span className="text-slate-500 font-normal">or drag and drop</span>
+                    </p>
+                    <p className="text-xs text-slate-400">SVG, PNG, JPG or GIF (max. 800x400px)</p>
+                  </div>
+                  <input type="file" className="hidden" accept="image/*" />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setShowCustomerModal(false)}
-                  className="flex-1 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium text-slate-700 transition-colors text-sm"
+                  className="px-8 py-2.5 border border-gray-300 rounded hover:bg-gray-50 font-medium text-slate-700 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => setShowCustomerModal(false)}
-                  className="flex-1 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-medium shadow-lg shadow-orange-500/30 transition-all text-sm"
+                  className="px-8 py-2.5 bg-orange-500 text-white rounded hover:bg-orange-600 font-medium transition-all"
                 >
                   Submit
                 </button>
@@ -708,7 +685,6 @@ export default function POS() {
         </div>
       )}
 
-      {/* Sticky footer */}
       <div className="fixed left-0 right-0 bottom-0 bg-white/95 border-t py-4 z-50">
         <div className="max-w-[1400px] mx-auto px-6 flex items-center justify-center gap-4">
           <button className="px-6 py-3 rounded-lg bg-orange-500 text-white flex items-center gap-2 shadow hover:bg-orange-600">

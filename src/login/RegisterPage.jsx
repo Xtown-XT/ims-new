@@ -5,40 +5,64 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import logo from "../components/assets/Company_logo.png";
 import x_logo from "../components/assets/Dark Logo.png";
 import { userService } from "../ims/services/Userservice";
+import { setAuthData } from "../ims/services/auth";
 
 const Register = () => {
   const navigate = useNavigate();
 
-  // Form states
   const [formData, setFormData] = useState({
-    name: "",
+    username: "",
     email: "",
     phone: "",
     password: "",
-    role: "user", // Default role as per backend
+    role: "user",
   });
 
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Handle input change
+  // 🔹 Handle input
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" });
   };
 
-  // 🔹 Register handler
+  // 🔹 Validation
+  const validate = () => {
+    const newErrors = {};
+
+    // Username – alphabets only
+    if (!formData.username.trim()) newErrors.username = "Username is required";
+    else if (!/^[A-Za-z\s]+$/.test(formData.username))
+      newErrors.username = "Username must contain only alphabets";
+
+    // Email validation
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
+      newErrors.email = "Invalid email format";
+
+    // Phone validation
+    if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
+    else if (!/^\d{10}$/.test(formData.phone))
+      newErrors.phone = "Enter valid 10-digit number";
+
+    // Password validation
+    if (!formData.password.trim()) newErrors.password = "Password is required";
+    else if (formData.password.length < 6)
+      newErrors.password = "Min 6 characters required";
+    else if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password))
+      newErrors.password = "Password must contain at least one special character";
+
+    return newErrors;
+  };
+
+  // 🔹 Register
   const handleRegister = async (e) => {
     e.preventDefault();
-
-    const { name, email, password, phone, role } = formData;
-
-    if (!name || !email || !password || !role || !phone) {
-      antdMessage.error("Please fill all fields");
-      return;
-    }
-
-    if (password.length < 6) {
-      antdMessage.error("Password must be at least 6 characters");
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length) {
+      setErrors(validationErrors);
       return;
     }
 
@@ -47,18 +71,22 @@ const Register = () => {
       console.log("📦 Payload sent to API:", formData);
 
       const res = await userService.register(formData);
+      console.log("✅ Registered user:", res.data);
 
-      antdMessage.success(res.data.message || "Registration successful!");
-      console.log("✅ Registered user:", res.data.user);
-
-      if (res.data.token) {
-        localStorage.setItem("token", res.data.token);
+      if (res.data?.accessToken) {
+        setAuthData(res.data);
       }
 
-      navigate("/dashboard");
+      antdMessage.success(res.data?.message || "Registration successful!");
+      setTimeout(() => navigate("/"), 1500);
     } catch (err) {
       console.error("❌ Register API Error:", err.response?.data || err);
-      antdMessage.error(err.response?.data?.message || "Registration failed!");
+      const msg =
+        err.response?.data?.message ||
+        (err.response?.status === 400
+          ? "User already exists!"
+          : "Registration failed!");
+      antdMessage.error(msg);
     } finally {
       setLoading(false);
     }
@@ -86,70 +114,64 @@ const Register = () => {
             CREATE AN ACCOUNT
           </h3>
 
-          {/* Name */}
+          {/* Username */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Full Name
+              Username
             </label>
             <input
               type="text"
-              name="name"
-              value={formData.name}
+              name="username"
+              value={formData.username}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
-              placeholder="Enter your name"
-              required
+              className={`w-full px-4 py-2 rounded-lg bg-gray-100 border ${
+                errors.username ? "border-red-500" : "border-gray-300"
+              } focus:outline-none focus:ring-2 focus:ring-gray-400`}
+              placeholder="Enter your username"
             />
+            {errors.username && (
+              <p className="text-red-500 text-sm mt-1">{errors.username}</p>
+            )}
           </div>
 
           {/* Email */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address
+              Email
             </label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
+              className={`w-full px-4 py-2 rounded-lg bg-gray-100 border ${
+                errors.email ? "border-red-500" : "border-gray-300"
+              } focus:outline-none focus:ring-2 focus:ring-gray-400`}
               placeholder="Enter your email"
-              required
             />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+            )}
           </div>
 
           {/* Phone */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Phone Number
+              Phone
             </label>
             <input
               type="tel"
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
+              className={`w-full px-4 py-2 rounded-lg bg-gray-100 border ${
+                errors.phone ? "border-red-500" : "border-gray-300"
+              } focus:outline-none focus:ring-2 focus:ring-gray-400`}
               placeholder="Enter your phone number"
-              required
             />
-          </div>
-
-          {/* Role */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Role
-            </label>
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
-              required
-            >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-              <option value="superadmin">SuperAdmin</option>
-            </select>
+            {errors.phone && (
+              <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+            )}
           </div>
 
           {/* Password */}
@@ -162,9 +184,10 @@ const Register = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-4 py-2 pr-10 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
+              className={`w-full px-4 py-2 pr-10 rounded-lg bg-gray-100 border ${
+                errors.password ? "border-red-500" : "border-gray-300"
+              } focus:outline-none focus:ring-2 focus:ring-gray-400`}
               placeholder="Enter password"
-              required
             />
             {showPassword ? (
               <FaEyeSlash
@@ -177,9 +200,29 @@ const Register = () => {
                 onClick={() => setShowPassword(true)}
               />
             )}
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+            )}
           </div>
 
-          {/* Submit Button */}
+          {/* Role */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Role
+            </label>
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            >
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+              <option value="superadmin">SuperAdmin</option>
+            </select>
+          </div>
+
+          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
@@ -188,7 +231,7 @@ const Register = () => {
             {loading ? <Spin /> : "REGISTER"}
           </button>
 
-          {/* Login redirect */}
+          {/* Login Redirect */}
           <p className="text-center mt-4 text-sm text-gray-600">
             Already have an account?
             <span
