@@ -17,6 +17,11 @@ import Invoices from "./pages/Sales/invoices";
 import Quotation from "./pages/Sales/Quotation";
 import Dashboard from "./pages/Dashboard";
 
+//purchase
+import Purchases from "./pages/purchases/Purchases";
+import PurchaseOrder from "./pages/purchases/PurchaseOrder";
+import PurchaseReturn from "./pages/purchases/PurchaseReturn";
+
 export const imsMenuItems = [
   {
     icon: <FileDoneOutlined />,
@@ -66,6 +71,31 @@ export const imsMenuItems = [
     key: "/ims/quotation",
     label: "Quotation",
   },
+
+  //purchase
+  {
+    icon: <ShoppingCartOutlined />,
+    key: "/ims/purchases",
+    label: "Purchases",
+    // 👇 Dropdown with icons for each item
+    children: [
+      {
+        key: "/ims/purchases/list",
+        label: "Purchases",
+        icon: <ShoppingOutlined />, // 🛍️ basket-like icon
+      },
+      {
+        key: "/ims/purchases/order",
+        label: "Purchase Order",
+        icon: <FileTextOutlined />, // 📄 document-like icon
+      },
+      {
+        key: "/ims/purchases/return",
+        label: "Purchase Return",
+        icon: <RollbackOutlined />, // ↩️ return arrow icon
+      },
+    ],
+  },
 ];
 
 const IMSRoutes = () => {
@@ -89,6 +119,12 @@ const IMSRoutes = () => {
       
       {/* Quotation Route */}
       <Route path="quotation" element={<Quotation />} />
+
+      {/* Purchases */}
+      <Route path="purchases/list" element={<Purchases />} />
+      <Route path="purchases/order" element={<PurchaseOrder />} />
+      <Route path="purchases/return" element={<PurchaseReturn />} />
+    
     </Routes>
   );
 };
